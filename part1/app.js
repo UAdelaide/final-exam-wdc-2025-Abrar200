@@ -8,9 +8,9 @@ const PORT = process.env.PORT || 3000;
 
 // Database configuration
 const dbConfig = {
-    host: 'localhost',
+    socketPath: '/var/run/mysqld/mysqld.sock',
     user: 'root',
-    password: 'password', // Update with your MySQL password
+    password: '', // Empty password for development
     database: 'DogWalkService',
     multipleStatements: true
 };
