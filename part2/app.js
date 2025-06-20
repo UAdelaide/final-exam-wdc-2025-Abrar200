@@ -1,8 +1,20 @@
 const express = require('express');
 const path = require('path');
+const session = require('express-session'); // Add session support
 require('dotenv').config();
 
 const app = express();
+
+// Session configuration - ADD THIS
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-here', // Use environment variable in production
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Set to true in production with HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
 
 // Middleware
 app.use(express.json());
