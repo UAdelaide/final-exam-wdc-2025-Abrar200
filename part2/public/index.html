@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Dog Walking Service</title>
@@ -7,14 +8,64 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
+
 <body class="bg-light">
 
   <div id="app" class="container py-5">
-    <h1 class="mb-4 text-primary">{{ message }}</h1>
-    <p class="lead">Connect with trusted walkers for your beloved dog!</p>
+    <!-- Login Form - shown when not logged in -->
+    <div v-if="!isLoggedIn" class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-body">
+            <h1 class="text-center text-primary mb-4">Welcome to the Dog Walking Service!</h1>
 
-    <a href="owner-dashboard.html" class="btn btn-outline-primary me-2">Owner Dashboard</a>
-    <a href="walker-dashboard.html" class="btn btn-outline-success">Walker Dashboard</a>
+            <!-- Login Form -->
+            <form @submit.prevent="login">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" v-model="loginForm.username" required
+                  placeholder="Enter your username">
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" v-model="loginForm.password" required
+                  placeholder="Enter your password">
+              </div>
+
+              <!-- Error message display -->
+              <div v-if="errorMessage" class="alert alert-danger" role="alert">
+                {{ errorMessage }}
+              </div>
+
+              <!-- Loading state -->
+              <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isLoading ? 'Logging in...' : 'Log In' }}
+              </button>
+            </form>
+
+            <!-- Sample login credentials for testing -->
+            <div class="mt-4">
+              <small class="text-muted">
+                <strong>Test Accounts:</strong><br>
+                Owner: ownerJane / hashedpassword123<br>
+                Walker: walkerMike / hashedpassword456
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome message - shown when logged in -->
+    <div v-else class="text-center">
+      <h1 class="mb-4 text-primary">Welcome back, {{ currentUser.username }}!</h1>
+      <p class="lead">Redirecting to your dashboard...</p>
+
+      <!-- Logout button for testing -->
+      <button @click="logout" class="btn btn-outline-secondary mt-3">Logout</button>
+    </div>
   </div>
 
   <script>
@@ -22,12 +73,103 @@
     createApp({
       data() {
         return {
-          message: 'Welcome to the Dog Walking Service!'
+          isLoggedIn: false,
+          currentUser: null,
+          loginForm: {
+            username: '',
+            password: ''
+          },
+          errorMessage: '',
+          isLoading: false
         };
+      },
+
+      async mounted() {
+        // Check if user is already logged in on page load
+        await this.checkAuthStatus();
+      },
+
+      methods: {
+        // Check current authentication status
+        async checkAuthStatus() {
+          try {
+            const response = await fetch('/api/users/me');
+            if (response.ok) {
+              this.currentUser = await response.json();
+              this.isLoggedIn = true;
+              this.redirectToDashboard();
+            }
+          } catch (error) {
+            console.log('Not logged in');
+          }
+        },
+
+        // Handle login form submission
+        async login() {
+          this.isLoading = true;
+          this.errorMessage = '';
+
+          try {
+            const response = await fetch('/api/users/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                username: this.loginForm.username,
+                password: this.loginForm.password
+              })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              // Login successful
+              this.currentUser = data.user;
+              this.isLoggedIn = true;
+
+              // Redirect based on user role
+              setTimeout(() => {
+                this.redirectToDashboard();
+              }, 1500); // Brief delay to show welcome message
+
+            } else {
+              // Login failed
+              this.errorMessage = data.error || 'Login failed';
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            this.errorMessage = 'Network error. Please try again.';
+          } finally {
+            this.isLoading = false;
+          }
+        },
+
+        // Redirect user to appropriate dashboard based on role
+        redirectToDashboard() {
+          if (this.currentUser.role === 'owner') {
+            window.location.href = '/owner-dashboard.html';
+          } else if (this.currentUser.role === 'walker') {
+            window.location.href = '/walker-dashboard.html';
+          }
+        },
+
+        // Handle logout
+        async logout() {
+          try {
+            await fetch('/api/users/logout', { method: 'POST' });
+            this.isLoggedIn = false;
+            this.currentUser = null;
+            this.loginForm = { username: '', password: '' };
+          } catch (error) {
+            console.error('Logout error:', error);
+          }
+        }
       }
     }).mount('#app');
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
