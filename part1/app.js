@@ -23,9 +23,21 @@ async function initializeDatabase() {
         db = await mysql.createConnection(dbConfig);
         console.log('Connected to MySQL database');
 
-        // Read and execute the SQL schema file (which creates the database)
+        // Read the SQL schema file
         const sqlSchema = await fs.readFile(path.join(__dirname, 'dogwalks.sql'), 'utf8');
-        await db.execute(sqlSchema);
+
+        // Split the SQL into individual statements and execute them
+        const statements = sqlSchema
+            .split(';')
+            .map(stmt => stmt.trim())
+            .filter(stmt => stmt.length > 0);
+
+        for (const statement of statements) {
+            if (statement.trim()) {
+                await db.execute(statement);
+            }
+        }
+
         console.log('Database schema initialized');
 
         // Switch to the created database
