@@ -1,6 +1,49 @@
-// POST login with session storage - REPLACE existing login route
+const express = require('express');
+const router = express.Router(); // This line was missing!
+const db = require('../models/db');
+
+// GET all users (for admin/testing)
+router.get('/', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT user_id, username, email, role FROM Users');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
+// POST a new user (simple signup)
+router.post('/register', async (req, res) => {
+  const { username, email, password, role } = req.body;
+
+  try {
+    const [result] = await db.query(`
+      INSERT INTO Users (username, email, password_hash, role)
+      VALUES (?, ?, ?, ?)
+    `, [username, email, password, role]);
+
+    res.status(201).json({ message: 'User registered', user_id: result.insertId });
+  } catch (error) {
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
+// Middleware to check if user is authenticated
+const requireAuth = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  next();
+};
+
+// GET current user session info
+router.get('/me', requireAuth, (req, res) => {
+  res.json(req.session.user);
+});
+
+// POST login with session storage
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body; // Changed to username instead of email
+  const { username, password } = req.body;
 
   try {
     // Query user by username and password (simple comparison for now)
@@ -37,7 +80,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// POST logout - ADD THIS NEW ROUTE
+// POST logout
 router.post('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -47,19 +90,4 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// Middleware to check if user is authenticated - ADD THIS
-const requireAuth = (req, res, next) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-  next();
-};
-
-// GET current user session info - MODIFY existing /me route
-router.get('/me', requireAuth, (req, res) => {
-  res.json(req.session.user);
-});
-
-// Export the auth middleware for use in other routes
 module.exports = router;
-module.exports.requireAuth = requireAuth;
