@@ -108,6 +108,7 @@ async function insertSampleData() {
 
 // Middleware
 app.use(express.json());
+app.use(express.static('public'));
 
 // Route: /api/dogs
 app.get('/api/dogs', async (req, res) => {
