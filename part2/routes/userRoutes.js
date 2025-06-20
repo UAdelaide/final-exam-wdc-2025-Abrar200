@@ -41,9 +41,11 @@ router.get('/me', requireAuth, (req, res) => {
   res.json(req.session.user);
 });
 
-// POST login with session storage
+// POST login with session storage and debugging
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
+
+  console.log('Login attempt:', { username, password }); // Debug log
 
   try {
     // Query user by username and password (simple comparison for now)
@@ -52,11 +54,15 @@ router.post('/login', async (req, res) => {
       WHERE username = ? AND password_hash = ?
     `, [username, password]);
 
+    console.log('Database query result:', rows); // Debug log
+
     if (rows.length === 0) {
+      console.log('No matching user found'); // Debug log
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const user = rows[0];
+    console.log('User found:', user); // Debug log
 
     // Store user information in session
     req.session.user = {
@@ -65,6 +71,8 @@ router.post('/login', async (req, res) => {
       email: user.email,
       role: user.role
     };
+
+    console.log('Session stored:', req.session.user); // Debug log
 
     // Return success with user role for frontend redirection
     res.json({
