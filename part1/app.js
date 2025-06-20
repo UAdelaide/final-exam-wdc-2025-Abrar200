@@ -34,14 +34,15 @@ async function initializeDatabase() {
 
         for (const statement of statements) {
             if (statement.trim()) {
-                await db.execute(statement);
+                // Use query() for DDL statements instead of execute()
+                await db.query(statement);
             }
         }
 
         console.log('Database schema initialized');
 
-        // Switch to the created database
-        await db.execute('USE DogWalkService');
+        // Switch to the created database - use query() for USE statement
+        await db.query('USE DogWalkService');
         console.log('Switched to DogWalkService database');
 
         // Insert sample data
