@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐕🐾🎉 AMAZING DOG WALKING SERVICE - BEST DOGS EVER!!! 🎉🐾🐕</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ffff00, #ff00ff, #00ffff);
+            background-size: 400% 400%;
+            animation: rainbow 2s ease-in-out infinite alternate;
+            overflow-x: hidden;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="8" fill="red"/></svg>'), auto;
+        }
+
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-30px);
+            }
+
+            60% {
+                transform: translateY(-15px);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes flash {
+
+            0%,
+            50%,
+            100% {
+                opacity: 1;
+            }
+
+            25%,
+            75% {
+                opacity: 0;
+            }
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 10px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 4em;
+            color: #ff0000;
+            text-shadow: 3px 3px 0 #00ff00, 6px 6px 0 #0000ff;
+            animation: bounce 1s infinite, flash 0.5s infinite;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .warning-banner {
+            background: linear-gradient(90deg, red, yellow, red);
+            color: black;
+            font-weight: bold;
+            font-size: 1.5em;
+            padding: 20px;
+            animation: flash 0.3s infinite;
+            border: 5px dashed #ff00ff;
+            margin: 20px 0;
+        }
+
+        .dog-container {
+            position: relative;
+            display: inline-block;
+            margin: 50px 0;
+        }
+
+        .dog-image {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border: 10px solid #ff00ff;
+            border-radius: 50%;
+            animation: spin 3s linear infinite;
+            box-shadow: 0 0 50px #00ff00;
+        }
+
+        .floating-text {
+            position: absolute;
+            top: -50px;
+            left: -100px;
+            right: -100px;
+            font-size: 2em;
+            color: #ff0000;
+            animation: bounce 2s infinite;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .navigation {
+            margin: 50px 0;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            border: 3px solid #000;
+            color: white;
+            padding: 15px 8px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.1s;
+            animation: flash 1s infinite;
+            min-width: 120px;
+            margin: 2px;
+        }
+
+        .nav-button:hover {
+            transform: scale(1.2) rotate(10deg);
+            box-shadow: 0 0 20px #ff00ff;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 5px dotted #ff0000;
+            padding: 20px;
+            transform: rotate(-2deg);
+            box-shadow: 10px 10px 0 #00ff00;
+            position: relative;
+        }
+
+        .info-card:nth-child(even) {
+            transform: rotate(2deg);
+            background: rgba(255, 255, 0, 0.9);
+            border-color: #0000ff;
+        }
+
+        .info-card h3 {
+            color: #ff00ff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-decoration: underline;
+            animation: bounce 1.5s infinite;
+        }
+
+        .contact-form {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            padding: 30px;
+            margin: 40px 0;
+            border: 8px ridge #ff00ff;
+            transform: skew(-5deg);
+        }
+
+        .form-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ff0000;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 3px solid #00ff00;
+            background: #ffff00;
+            color: #ff0000;
+            font-size: 1.2em;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff);
+            color: white;
+            border: 5px solid #ffff00;
+            padding: 20px 40px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            animation: bounce 1s infinite, flash 0.8s infinite;
+            text-transform: uppercase;
+            margin: 20px 0;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background: linear-gradient(45deg, #ffff00, #ff00ff);
+            border: 10px solid #00ff00;
+            padding: 40px;
+            text-align: center;
+            animation: spin 2s linear infinite;
+            max-width: 400px;
+        }
+
+        .popup h2 {
+            color: #ff0000;
+            font-size: 2em;
+            margin-bottom: 20px;
+            animation: flash 0.5s infinite;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 15px;
+            height: 15px;
+            background: #ff0000;
+            color: white;
+            border: 1px solid #000;
+            cursor: pointer;
+            font-size: 8px;
+        }
+
+        .ticker {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #ff0000;
+            color: #ffff00;
+            padding: 10px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 1.2em;
+            font-weight: bold;
+            z-index: 999;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            animation: scroll-left 15s linear infinite;
+        }
+
+        @keyframes scroll-left {
+            0% {
+                transform: translateX(100%);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .hidden-links {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+        }
+
+        .sound-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+        }
+
+        .auto-play-audio {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-button {
+                width: 90%;
+                margin: 5px 0;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ff00ff;
+            border-top: 5px solid #00ff00;
+            border-radius: 50%;
+            animation: spin 0.5s linear infinite;
+            margin: 20px auto;
+        }
+
+        .error-text {
+            color: #ff0000;
+            font-size: 2em;
+            animation: flash 0.3s infinite;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Hidden links for screen readers -->
+        <div class="hidden-links">
+            <a href="#navigation">Skip to navigation</a>
+            <a href="#main-content">Skip to main content</a>
+        </div>
+
+        <!-- Auto-playing audio -->
+        <audio class="auto-play-audio" loop autoplay>
+            <source
+                src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmUyCS6EyfPYgjkYa77x5YdMGAg+k9v2x3IlBSuBzvLZiTcJGGi877eeTRQMUarm5a9kHwg2jdnxx3ElBSp+yPPclj0YG2q+8eaGSxgIPpPb98dyJQUsgc7y2Yk2CRhovO/AoE4VDFCq5eetZSAINozZ8cdwJQUqfsjz3JY9GBtqvvHmhkwYBz6T2/fHciUFK4HO8tmJNgkYaLzuwaFNFAxPqufnrWYhBzaM2fHHcCUFKn7I89yWPRgbar7x5oZMGAc+k9v3x3IlBSuBzvLZiTYJGGi8786hTRUMT6rm562YSxUM"
+                type="audio/wav">
+        </audio>
+
+        <!-- Sound controls -->
+        <div class="sound-controls">
+            <button @click="toggleSound"
+                style="background: #ff0000; color: white; border: 2px solid #00ff00; padding: 5px;">
+                {{ soundOn ? 'STOP MUSIC' : 'PLAY MUSIC' }}
+            </button>
+        </div>
+
+        <div class="container">
+            <!-- Overly long, flashing title -->
+            <h1>🐕🎉 WELCOME TO THE MOST AMAZING INCREDIBLE FANTASTIC DOG WALKING SERVICE IN THE ENTIRE UNIVERSE 🎉🐕
+            </h1>
+
+            <!-- Warning banner that flashes -->
+            <div class="warning-banner">
+                ⚠️ URGENT: CLICK HERE NOW FOR SPECIAL LIMITED TIME OFFER!!! ONLY TODAY!!! ⚠️
+            </div>
+
+            <!-- Main content area -->
+            <div id="main-content">
+                <!-- Dog of the day section -->
+                <div class="dog-container">
+                    <div class="floating-text">🌟 DOG OF THE DAY! 🌟</div>
+                    <img v-if="dogImage" :src="dogImage" alt="" class="dog-image">
+                    <div v-else class="loading-spinner"></div>
+                    <div v-if="error" class="error-text">ERROR LOADING DOG!</div>
+                </div>
+
+                <!-- Hard-coded dog details -->
+                <div class="info-card">
+                    <h3>🐕 Meet Sparkles! 🐕</h3>
+                    <p style="color: #ff0000; font-size: 1.3em; font-weight: bold;">
+                        Breed: Rainbow Golden Retriever Mix<br>
+                        Age: 3 years old<br>
+                        Personality: Super energetic and loves belly rubs!<br>
+                        Available for walks: Monday, Wednesday, Friday at 7 AM SHARP!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navigation with too many options -->
+            <nav id="navigation" class="navigation">
+                <button class="nav-button">HOME</button>
+                <button class="nav-button">DOGS</button>
+                <button class="nav-button">WALKERS</button>
+                <button class="nav-button">PRICING</button>
+                <button class="nav-button">ABOUT US</button>
+                <button class="nav-button">TESTIMONIALS</button>
+                <button class="nav-button">GALLERY</button>
+                <button class="nav-button">BLOG</button>
+                <button class="nav-button">NEWS</button>
+                <button class="nav-button">EVENTS</button>
+                <button class="nav-button">CAREERS</button>
+                <button class="nav-button">CONTACT</button>
+                <button class="nav-button">FAQ</button>
+                <button class="nav-button">TERMS</button>
+                <button class="nav-button">PRIVACY</button>
+                <button class="nav-button">SITEMAP</button>
+                <button class="nav-button">HELP</button>
+                <button class="nav-button">SUPPORT</button>
+            </nav>
+
+            <!-- Information grid -->
+            <div class="content-grid">
+                <div class="info-card">
+                    <h3>🚀 Premium Services!</h3>
+                    <p>We offer the best dog walking in the city! Our walkers are trained professionals who love dogs
+                        almost as much as you do! Book now for immediate service!</p>
+                </div>
+                <div class="info-card">
+                    <h3>💰 Amazing Prices!</h3>
+                    <p>Starting at just $15 per walk! But wait, there's more! Sign up today and get your first walk
+                        absolutely FREE! Limited time offer expires soon!</p>
+                </div>
+                <div class="info-card">
+                    <h3>📱 Easy Booking!</h3>
+                    <p>Simply fill out our comprehensive 47-step booking form below and we'll get back to you within
+                        24-48 business hours (excluding weekends and holidays)!</p>
+                </div>
+                <div class="info-card">
+                    <h3>⭐ 5-Star Reviews!</h3>
+                    <p>Don't just take our word for it! Read what our 50,000+ satisfied customers have to say about our
+                        incredible service and amazing walkers!</p>
+                </div>
+            </div>
+
+            <!-- Complex contact form -->
+            <div class="contact-form">
+                <h2 style="color: #ff0000; font-size: 2.5em; animation: flash 0.5s infinite;">📝 BOOK YOUR DOG WALK NOW!
+                </h2>
+                <form @submit.prevent="submitForm">
+                    <div class="form-group">
+                        <label>FIRST NAME (REQUIRED)*:</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>LAST NAME (REQUIRED)*:</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>EMAIL ADDRESS (REQUIRED)*:</label>
+                        <input type="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>PHONE NUMBER (REQUIRED)*:</label>
+                        <input type="tel" required>
+                    </div>
+                    <div class="form-group">
+                        <label>DOG'S NAME (REQUIRED)*:</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>DOG'S BREED (REQUIRED)*:</label>
+                        <select required>
+                            <option>Golden Retriever</option>
+                            <option>Labrador</option>
+                            <option>German Shepherd</option>
+                            <option>Poodle</option>
+                            <option>Bulldog</option>
+                            <option>Beagle</option>
+                            <option>Mixed Breed</option>
+                            <option>Other (please specify in comments)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>PREFERRED WALK TIME (REQUIRED)*:</label>
+                        <select required>
+                            <option>6:00 AM</option>
+                            <option>7:00 AM</option>
+                            <option>8:00 AM</option>
+                            <option>9:00 AM</option>
+                            <option>10:00 AM</option>
+                            <option>11:00 AM</option>
+                            <option>12:00 PM</option>
+                            <option>1:00 PM</option>
+                            <option>2:00 PM</option>
+                            <option>3:00 PM</option>
+                            <option>4:00 PM</option>
+                            <option>5:00 PM</option>
+                            <option>6:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>SPECIAL INSTRUCTIONS (REQUIRED)*:</label>
+                        <textarea rows="5" required
+                            placeholder="Please provide detailed instructions about your dog's behavior, preferred routes, treats, emergency contacts, veterinarian information, and any other relevant details..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn" @click="showPopup = true">
+                        🚀 SUBMIT BOOKING REQUEST NOW! 🚀
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Popup modal -->
+        <div v-if="showPopup" class="popup-overlay" @click="showPopup = false">
+            <div class="popup" @click.stop>
+                <button class="close-btn" @click="showPopup = false">X</button>
+                <h2>🎉 CONGRATULATIONS! 🎉</h2>
+                <p style="color: #ff0000; font-size: 1.2em; animation: flash 0.3s infinite;">
+                    Your booking request has been submitted! We'll contact you soon with more information about our
+                    services!
+                </p>
+            </div>
+        </div>
+
+        <!-- Moving ticker -->
+        <div class="ticker">
+            <div class="ticker-content">
+                🐕 BREAKING NEWS: New premium dog walking packages available now! Limited time 50% off! Call
+                1-800-DOG-WALK today! Don't miss out! 🐕 BREAKING NEWS: New premium dog walking packages available now!
+                Limited time 50% off! Call 1-800-DOG-WALK today! Don't miss out!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const dogImage = ref('');
+                const error = ref(false);
+                const showPopup = ref(false);
+                const soundOn = ref(false);
+
+                // Fetch random dog image
+                const fetchDogImage = async () => {
+                    try {
+                        const response = await fetch('https://dog.ceo/api/breeds/image/random');
+                        const data = await response.json();
+                        dogImage.value = data.message;
+                    } catch (err) {
+                        error.value = true;
+                    }
+                };
+
+                const submitForm = () => {
+                    showPopup.value = true;
+                };
+
+                const toggleSound = () => {
+                    soundOn.value = !soundOn.value;
+                    const audio = document.querySelector('.auto-play-audio');
+                    if (soundOn.value) {
+                        audio.play();
+                    } else {
+                        audio.pause();
+                    }
+                };
+
+                // Auto-show popup after 3 seconds
+                setTimeout(() => {
+                    showPopup.value = true;
+                }, 3000);
+
+                onMounted(() => {
+                    fetchDogImage();
+                });
+
+                return {
+                    dogImage,
+                    error,
+                    showPopup,
+                    soundOn,
+                    submitForm,
+                    toggleSound
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
