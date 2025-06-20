@@ -3,167 +3,282 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Dog Walking Service</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog Walking Service - All Dogs</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    .dog-photo {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #dee2e6;
+    }
+
+    .loading-spinner {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #dee2e6;
+    }
+
+    .dog-card {
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .dog-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 60px 0;
+      margin-bottom: 40px;
+    }
+
+    .btn-refresh {
+      background: linear-gradient(45deg, #ff6b6b, #ffa726);
+      border: none;
+      color: white;
+      border-radius: 25px;
+      padding: 8px 16px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-refresh:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    }
+  </style>
 </head>
 
-<body class="bg-light">
-
-  <div id="app" class="container py-5">
-    <!-- Login Form - shown when not logged in -->
-    <div v-if="!isLoggedIn" class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-body">
-            <h1 class="text-center text-primary mb-4">Welcome to the Dog Walking Service!</h1>
-
-            <!-- Login Form -->
-            <form @submit.prevent="login">
-              <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" v-model="loginForm.username" required
-                  placeholder="Enter your username">
-              </div>
-
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" v-model="loginForm.password" required
-                  placeholder="Enter your password">
-              </div>
-
-              <!-- Error message display -->
-              <div v-if="errorMessage" class="alert alert-danger" role="alert">
-                {{ errorMessage }}
-              </div>
-
-              <!-- Loading state -->
-              <button type="submit" class="btn btn-primary w-100" :disabled="isLoading">
-                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                {{ isLoading ? 'Logging in...' : 'Log In' }}
-              </button>
-            </form>
-
-
-
+<body>
+  <div id="app">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 fw-bold mb-4">🐕 Dog Walking Service</h1>
+            <p class="lead mb-4">Meet all the adorable dogs in our community!</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="login.html" class="btn btn-light btn-lg">Login</a>
+              <a href="register.html" class="btn btn-outline-light btn-lg">Register</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Welcome message - shown when logged in -->
-    <div v-else class="text-center">
-      <h1 class="mb-4 text-primary">Welcome back, {{ currentUser.username }}!</h1>
-      <p class="lead">Redirecting to your dashboard...</p>
+    <!-- Main Content -->
+    <div class="container">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading dogs...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading our furry friends...</p>
+      </div>
 
-      <!-- Logout button for testing -->
-      <button @click="logout" class="btn btn-outline-secondary mt-3">Logout</button>
+      <!-- Error State -->
+      <div v-if="error" class="alert alert-danger" role="alert">
+        <strong>Oops!</strong> {{ error }}
+        <button @click="loadDogs" class="btn btn-sm btn-outline-danger ms-2">Try Again</button>
+      </div>
+
+      <!-- Dogs Table -->
+      <div v-if="!loading && !error" class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">
+              <i class="fas fa-paw text-primary me-2"></i>
+              All Dogs ({{ dogs.length }})
+            </h2>
+            <button @click="refreshPhotos" class="btn btn-refresh" title="Refresh all photos">
+              <i class="fas fa-sync-alt me-1"></i>
+              New Photos
+            </button>
+          </div>
+
+          <!-- Dogs Grid -->
+          <div class="row g-4">
+            <div v-for="dog in dogs" :key="dog.dog_id" class="col-lg-4 col-md-6">
+              <div class="card dog-card h-100 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex align-items-start">
+                    <!-- Dog Photo -->
+                    <div class="me-3 flex-shrink-0">
+                      <div v-if="dog.photoLoading" class="loading-spinner">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                      </div>
+                      <img v-else :src="dog.photoUrl" :alt="`Photo of ${dog.name}`" class="dog-photo"
+                        @error="handleImageError(dog)" @load="dog.photoLoading = false">
+                    </div>
+
+                    <!-- Dog Details -->
+                    <div class="flex-grow-1">
+                      <h5 class="card-title mb-2">
+                        {{ dog.name }}
+                        <span class="badge bg-primary ms-2">{{ dog.size }}</span>
+                      </h5>
+                      <p class="card-text text-muted mb-2">
+                        <i class="fas fa-user me-1"></i>
+                        Owner: {{ dog.owner_username }}
+                      </p>
+                      <p class="card-text">
+                        <small class="text-muted">
+                          <i class="fas fa-hashtag me-1"></i>
+                          ID: {{ dog.dog_id }}
+                        </small>
+                      </p>
+                      <button @click="refreshSinglePhoto(dog)" class="btn btn-sm btn-outline-primary"
+                        :disabled="dog.photoLoading">
+                        <i class="fas fa-sync-alt me-1"></i>
+                        New Photo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-if="dogs.length === 0" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-dog fa-3x text-muted"></i>
+            </div>
+            <h3 class="text-muted">No Dogs Found</h3>
+            <p class="text-muted">It looks like there are no dogs registered yet.</p>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-light mt-5 py-4">
+      <div class="container text-center">
+        <p class="mb-0 text-muted">
+          &copy; 2025 Dog Walking Service. Photos provided by
+          <a href="https://dog.ceo" target="_blank" class="text-decoration-none">Dog CEO API</a>
+        </p>
+      </div>
+    </footer>
   </div>
 
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <script>
-    const { createApp } = Vue;
+    const { createApp, ref, onMounted } = Vue;
+
     createApp({
-      data() {
-        return {
-          isLoggedIn: false,
-          currentUser: null,
-          loginForm: {
-            username: '',
-            password: ''
-          },
-          errorMessage: '',
-          isLoading: false
-        };
-      },
+      setup() {
+        const dogs = ref([]);
+        const loading = ref(true);
+        const error = ref('');
 
-      async mounted() {
-        // Check if user is already logged in on page load
-        await this.checkAuthStatus();
-      },
-
-      methods: {
-        // Check current authentication status
-        async checkAuthStatus() {
+        // Load all dogs from database
+        async function loadDogs() {
           try {
-            const response = await fetch('/api/users/me');
-            if (response.ok) {
-              this.currentUser = await response.json();
-              this.isLoggedIn = true;
-              this.redirectToDashboard();
+            loading.value = true;
+            error.value = '';
+
+            const response = await fetch('/api/dogs');
+            if (!response.ok) {
+              throw new Error('Failed to load dogs');
             }
-          } catch (error) {
-            console.log('Not logged in');
-          }
-        },
 
-        // Handle login form submission
-        async login() {
-          this.isLoading = true;
-          this.errorMessage = '';
+            const dogsData = await response.json();
+            dogs.value = dogsData.map(dog => ({
+              ...dog,
+              photoUrl: '',
+              photoLoading: true
+            }));
 
-          try {
-            const response = await fetch('/api/users/login', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                username: this.loginForm.username,
-                password: this.loginForm.password
-              })
-            });
+            // Load photos for all dogs
+            await loadPhotosForAllDogs();
 
-            const data = await response.json();
-
-            if (response.ok) {
-              // Login successful
-              this.currentUser = data.user;
-              this.isLoggedIn = true;
-
-              // Redirect based on user role
-              setTimeout(() => {
-                this.redirectToDashboard();
-              }, 1500); // Brief delay to show welcome message
-
-            } else {
-              // Login failed
-              this.errorMessage = data.error || 'Login failed';
-            }
-          } catch (error) {
-            console.error('Login error:', error);
-            this.errorMessage = 'Network error. Please try again.';
+          } catch (err) {
+            error.value = err.message;
+            console.error('Error loading dogs:', err);
           } finally {
-            this.isLoading = false;
-          }
-        },
-
-        // Redirect user to appropriate dashboard based on role
-        redirectToDashboard() {
-          if (this.currentUser.role === 'owner') {
-            window.location.href = '/owner-dashboard.html';
-          } else if (this.currentUser.role === 'walker') {
-            window.location.href = '/walker-dashboard.html';
-          }
-        },
-
-        // Handle logout
-        async logout() {
-          try {
-            await fetch('/api/users/logout', { method: 'POST' });
-            this.isLoggedIn = false;
-            this.currentUser = null;
-            this.loginForm = { username: '', password: '' };
-          } catch (error) {
-            console.error('Logout error:', error);
+            loading.value = false;
           }
         }
+
+        // Load photos for all dogs
+        async function loadPhotosForAllDogs() {
+          const photoPromises = dogs.value.map(dog => loadRandomPhoto(dog));
+          await Promise.allSettled(photoPromises);
+        }
+
+        // Load a random photo for a specific dog
+        async function loadRandomPhoto(dog) {
+          try {
+            dog.photoLoading = true;
+            const response = await fetch('https://dog.ceo/api/breeds/image/random');
+            const data = await response.json();
+
+            if (data.status === 'success') {
+              dog.photoUrl = data.message;
+            } else {
+              throw new Error('Failed to get photo from Dog CEO API');
+            }
+          } catch (err) {
+            console.error(`Error loading photo for ${dog.name}:`, err);
+            // Fallback to a placeholder image
+            dog.photoUrl = `https://via.placeholder.com/80x80/007bff/ffffff?text=${dog.name[0]}`;
+          } finally {
+            dog.photoLoading = false;
+          }
+        }
+
+        // Refresh photos for all dogs
+        async function refreshPhotos() {
+          dogs.value.forEach(dog => {
+            dog.photoLoading = true;
+          });
+          await loadPhotosForAllDogs();
+        }
+
+        // Refresh photo for a single dog
+        async function refreshSinglePhoto(dog) {
+          await loadRandomPhoto(dog);
+        }
+
+        // Handle image loading errors
+        function handleImageError(dog) {
+          console.error(`Failed to load image for ${dog.name}`);
+          dog.photoUrl = `https://via.placeholder.com/80x80/6c757d/ffffff?text=${dog.name[0]}`;
+          dog.photoLoading = false;
+        }
+
+        // Load dogs when component mounts
+        onMounted(() => {
+          loadDogs();
+        });
+
+        return {
+          dogs,
+          loading,
+          error,
+          loadDogs,
+          refreshPhotos,
+          refreshSinglePhoto,
+          handleImageError
+        };
       }
     }).mount('#app');
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
