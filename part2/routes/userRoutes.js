@@ -2,6 +2,51 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/db');
 
+// Database test route - ADD THIS TEMPORARILY
+router.get('/test-db', async (req, res) => {
+  try {
+    console.log('Testing database connection...');
+
+    // Test basic connection
+    const [result] = await db.query('SELECT 1 as test');
+    console.log('Basic query result:', result);
+
+    // Test if Users table exists and show its structure
+    const [tables] = await db.query('SHOW TABLES');
+    console.log('Available tables:', tables);
+
+    // Show Users table structure
+    const [structure] = await db.query('DESCRIBE Users');
+    console.log('Users table structure:', structure);
+
+    // Test Users table content
+    const [users] = await db.query('SELECT * FROM Users');
+    console.log('All users in database:', users);
+
+    // Test the exact query we're using in login
+    const [testQuery] = await db.query(`
+      SELECT user_id, username, email, role FROM Users
+      WHERE username = ? AND password_hash = ?
+    `, ['ownerJane', 'hashedpassword123']);
+    console.log('Login query test result:', testQuery);
+
+    res.json({
+      connection: 'OK',
+      tables: tables,
+      userTableStructure: structure,
+      allUsers: users,
+      loginTestQuery: testQuery
+    });
+  } catch (error) {
+    console.error('Database test error:', error);
+    res.status(500).json({
+      error: error.message,
+      code: error.code,
+      sqlMessage: error.sqlMessage
+    });
+  }
+});
+
 // GET all users (for admin/testing)
 router.get('/', async (req, res) => {
   try {
