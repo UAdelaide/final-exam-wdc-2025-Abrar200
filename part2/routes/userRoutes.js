@@ -143,7 +143,8 @@ router.post('/logout', (req, res) => {
   });
 });
 
-// Add this to routes/userRoutes.js or create a new dogRoutes.js file
+
+
 router.get('/my-dogs', requireAuth, async (req, res) => {
   try {
     const userId = req.session.user.user_id;
