@@ -143,27 +143,16 @@ router.post('/logout', (req, res) => {
   });
 });
 
-
-
 router.get('/my-dogs', requireAuth, async (req, res) => {
   try {
     const userId = req.session.user.user_id;
 
-    const query = `
-      SELECT dog_id, name, size
-      FROM Dogs
-      WHERE owner_id = ?
-      ORDER BY name
-    `;
+    const [rows] = await db.execute(
+      'SELECT dog_id, name, size FROM Dogs WHERE owner_id = ? ORDER BY name',
+      [userId]
+    );
 
-    db.query(query, [userId], (err, results) => {
-      if (err) {
-        console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error' });
-      }
-
-      res.json(results);
-    });
+    res.json(rows);
   } catch (error) {
     console.error('Error fetching dogs:', error);
     res.status(500).json({ error: 'Failed to fetch dogs' });
