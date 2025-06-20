@@ -51,7 +51,21 @@
         const walks = ref([]);
         const message = ref('');
         const error = ref('');
-        const user = 3;
+        const currentUserId = ref(null);
+
+        async function getCurrentUser() {
+          try {
+            const res = await fetch('/api/users/me');
+            if (!res.ok) throw new Error('Failed to get current user');
+            const userData = await res.json();
+            currentUserId.value = userData.user_id;
+            return userData.user_id;
+          } catch (err) {
+            error.value = 'Failed to get current user information';
+            console.error('Error getting current user:', err);
+            return null;
+          }
+        }
 
         async function loadWalkRequests() {
           try {
@@ -65,10 +79,19 @@
 
         async function applyToWalk(requestId) {
           try {
+            // Get current user ID dynamically
+            if (!currentUserId.value) {
+              await getCurrentUser();
+            }
+
+            if (!currentUserId.value) {
+              throw new Error('Unable to get current user information');
+            }
+
             const res = await fetch(`/api/walks/${requestId}/apply`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ walker_id: user })
+              body: JSON.stringify({ walker_id: currentUserId.value })
             });
             const result = await res.json();
 
@@ -83,6 +106,7 @@
         }
 
         onMounted(() => {
+          getCurrentUser();
           loadWalkRequests();
         });
 
@@ -90,6 +114,7 @@
           walks,
           message,
           error,
+          currentUserId,
           applyToWalk
         };
       }
