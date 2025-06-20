@@ -62,16 +62,53 @@
 
 <body>
   <div id="app">
-    <!-- Hero Section -->
+    <!-- Hero Section with Login Form -->
     <div class="hero-section">
       <div class="container">
         <div class="row">
           <div class="col-lg-8 mx-auto text-center">
             <h1 class="display-4 fw-bold mb-4">🐕 Dog Walking Service</h1>
-            <p class="lead mb-4">Meet all the adorable dogs in our community!</p>
-            <div class="d-flex justify-content-center gap-3">
-              <a href="login.html" class="btn btn-light btn-lg">Login</a>
-              <a href="register.html" class="btn btn-outline-light btn-lg">Register</a>
+            <p class="lead mb-4">Connect with trusted dog walkers in your community</p>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg">
+              <div class="card-body p-4">
+                <h3 class="card-title text-center mb-4 text-dark">Login</h3>
+
+                <!-- Success/Error Messages -->
+                <div v-if="loginMessage" class="alert alert-success" role="alert">
+                  {{ loginMessage }}
+                </div>
+                <div v-if="loginError" class="alert alert-danger" role="alert">
+                  {{ loginError }}
+                </div>
+
+                <!-- Login Form -->
+                <form @submit.prevent="submitLogin">
+                  <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input v-model="loginForm.username" type="text" class="form-control" id="username" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input v-model="loginForm.password" type="password" class="form-control" id="password" required>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-100" :disabled="loginLoading">
+                    <span v-if="loginLoading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ loginLoading ? 'Logging in...' : 'Login' }}
+                  </button>
+                </form>
+
+                <hr class="my-4">
+                <div class="text-center">
+                  <p class="mb-0 text-muted">Don't have an account?</p>
+                  <a href="register.html" class="btn btn-outline-primary btn-sm mt-2">Register Here</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -94,13 +131,13 @@
         <button @click="loadDogs" class="btn btn-sm btn-outline-danger ms-2">Try Again</button>
       </div>
 
-      <!-- Dogs Table -->
+      <!-- Dogs Table Section -->
       <div v-if="!loading && !error" class="row">
         <div class="col-12">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0">
               <i class="fas fa-paw text-primary me-2"></i>
-              All Dogs ({{ dogs.length }})
+              Meet Our Dogs ({{ dogs.length }})
             </h2>
             <button @click="refreshPhotos" class="btn btn-refresh" title="Refresh all photos">
               <i class="fas fa-sync-alt me-1"></i>
@@ -182,9 +219,58 @@
 
     createApp({
       setup() {
+        // Dogs data
         const dogs = ref([]);
         const loading = ref(true);
         const error = ref('');
+
+        // Login form data
+        const loginForm = ref({
+          username: '',
+          password: ''
+        });
+        const loginMessage = ref('');
+        const loginError = ref('');
+        const loginLoading = ref(false);
+
+        // Login function
+        async function submitLogin() {
+          try {
+            loginLoading.value = true;
+            loginError.value = '';
+            loginMessage.value = '';
+
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(loginForm.value)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.error || 'Login failed');
+            }
+
+            loginMessage.value = result.message;
+
+            // Redirect based on user role
+            setTimeout(() => {
+              if (result.user.role === 'owner') {
+                window.location.href = 'owner-dashboard.html';
+              } else if (result.user.role === 'walker') {
+                window.location.href = 'walker-dashboard.html';
+              }
+            }, 1000);
+
+          } catch (err) {
+            loginError.value = err.message;
+          } finally {
+            loginLoading.value = false;
+          }
+        }
 
         // Load all dogs from database
         async function loadDogs() {
@@ -268,13 +354,20 @@
         });
 
         return {
+          // Dogs data
           dogs,
           loading,
           error,
           loadDogs,
           refreshPhotos,
           refreshSinglePhoto,
-          handleImageError
+          handleImageError,
+          // Login data
+          loginForm,
+          loginMessage,
+          loginError,
+          loginLoading,
+          submitLogin
         };
       }
     }).mount('#app');
