@@ -6,15 +6,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database configuration
+// Database configuration - connect without database first
 const dbConfig = {
     host: 'localhost',
     user: 'root',
     password: '', // Empty password for development
-    database: 'DogWalkService',
-    multipleStatements: true,
-    acquireTimeout: 60000,
-    timeout: 60000
+    multipleStatements: true
 };
 
 let db;
@@ -22,14 +19,18 @@ let db;
 // Initialize database connection and setup
 async function initializeDatabase() {
     try {
-        // Create connection
+        // Create connection without specifying database first
         db = await mysql.createConnection(dbConfig);
         console.log('Connected to MySQL database');
 
-        // Read and execute the SQL schema file
+        // Read and execute the SQL schema file (which creates the database)
         const sqlSchema = await fs.readFile(path.join(__dirname, 'dogwalks.sql'), 'utf8');
         await db.execute(sqlSchema);
         console.log('Database schema initialized');
+
+        // Switch to the created database
+        await db.execute('USE DogWalkService');
+        console.log('Switched to DogWalkService database');
 
         // Insert sample data
         await insertSampleData();
