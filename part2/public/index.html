@@ -240,7 +240,7 @@
             loginError.value = '';
             loginMessage.value = '';
 
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch('/api/users/login', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -278,7 +278,7 @@
             loading.value = true;
             error.value = '';
 
-            const response = await fetch('/api/dogs');
+            const response = await fetch('/api/users/dogs');
             if (!response.ok) {
               throw new Error('Failed to load dogs');
             }
