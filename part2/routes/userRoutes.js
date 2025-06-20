@@ -143,4 +143,30 @@ router.post('/logout', (req, res) => {
   });
 });
 
+// Add this to routes/userRoutes.js or create a new dogRoutes.js file
+router.get('/my-dogs', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.user.user_id;
+
+    const query = `
+      SELECT dog_id, name, size
+      FROM Dogs
+      WHERE owner_id = ?
+      ORDER BY name
+    `;
+
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      res.json(results);
+    });
+  } catch (error) {
+    console.error('Error fetching dogs:', error);
+    res.status(500).json({ error: 'Failed to fetch dogs' });
+  }
+});
+
 module.exports = router;
